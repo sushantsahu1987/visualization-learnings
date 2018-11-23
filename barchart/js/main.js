@@ -20,10 +20,31 @@ d3.json("data/buildings.json")
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // X Axis Label
+    group
+      .append("text")
+      .attr("class", "x axis-label")
+      .attr("x", width / 2)
+      .attr("y", height + 90)
+      .attr("font-size", "18px")
+      .attr("text-anchor", "middle")
+      .text("The world's tallest buildings");
+
+    // Y Axis Label
+    group
+      .append("text")
+      .attr("class", "x axis-label")
+      .attr("x", -(height/2) )
+      .attr("y", -60)
+      .attr("font-size", "18px")
+      .attr("text-anchor", "middle")
+      .attr("transform","rotate(-90)")
+      .text("Height(m)");
+
     const y = d3 // y
       .scaleLinear()
       .domain([0, d3.max(data, d => d.height)])
-      .range([0, height]);
+      .range([height, 0]); // Inversion required here
 
     const x = d3 // x
       .scaleBand()
@@ -38,9 +59,17 @@ d3.json("data/buildings.json")
       .append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0, " + height + ")")
-      .call(xAxisCall);
+      .call(xAxisCall)
+      .selectAll("text")
+      .attr("y", "10")
+      .attr("x", "-5")
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-20)");
 
-    const yAxisCall = d3.axisLeft(y);
+    const yAxisCall = d3
+      .axisLeft(y)
+      .ticks(4)
+      .tickFormat(d => d + "m");
 
     group
       .append("g")
@@ -56,12 +85,12 @@ d3.json("data/buildings.json")
         return x(d.name);
       })
       .attr("y", (d, i) => {
-        return 0;
+        return y(d.height); // Inversion required here
       })
       .attr("width", x.bandwidth)
       .attr("height", (d, i) => {
-        return y(d.height);
+        return height - y(d.height); // Inversion required here
       })
-      .attr("fill", "blue");
+      .attr("fill", "grey");
   })
   .catch(err => console.log(err));
