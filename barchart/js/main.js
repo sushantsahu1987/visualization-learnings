@@ -18,35 +18,49 @@ d3.json("data/buildings.json")
 
     const group = svg
       .append("g")
-      .attr(
-        "transform",
-        "translate(" + margin.left + "," + margin.top + ")"
-      );
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    const scale = d3
+    const y = d3 // y
       .scaleLinear()
       .domain([0, d3.max(data, d => d.height)])
       .range([0, height]);
 
-    const band = d3
+    const x = d3 // x
       .scaleBand()
       .domain(data.map(d => d.name))
       .range([0, width])
       .paddingInner(0.2)
-      .paddingOuter(0, 2);
+      .paddingOuter(0.2);
 
-    const rects = group.selectAll("rect").data(data)
+    const xAxisCall = d3.axisBottom(x);
+
+    group
+      .append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0, " + height + ")")
+      .call(xAxisCall);
+
+    const yAxisCall = d3.axisLeft(y);
+
+    group
+      .append("g")
+      .attr("class", "y axis")
+      .call(yAxisCall);
+
+    const rects = group
+      .selectAll("rect")
+      .data(data)
       .enter()
       .append("rect")
       .attr("x", (d, i) => {
-        return band(d.name);
+        return x(d.name);
       })
       .attr("y", (d, i) => {
-        return 20;
+        return 0;
       })
-      .attr("width", band.bandwidth)
+      .attr("width", x.bandwidth)
       .attr("height", (d, i) => {
-        return scale(d.height);
+        return y(d.height);
       })
       .attr("fill", "blue");
   })
